@@ -2,6 +2,7 @@ import streamlit as st
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def generate_distribution(dist_type, size, **params):
     if dist_type == 'Uniform':
         return np.random.uniform(params['low'], params['high'], size)
@@ -9,12 +10,13 @@ def generate_distribution(dist_type, size, **params):
         return np.random.normal(params['mean'], params['std'], size)
     elif dist_type == 'Exponential':
         return np.random.exponential(params['scale'], size)
-    elif dist_type == 'Binomial':
-        return np.random.binomial(params['n'], params['p'], size)
+    elif dist_type == 'Multinomial':
+        return np.random.multinomial(params['n'], params['p'], size)
+
 
 def plot_distributions(original_data, sample_means):
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
-    
+
     # Plot original distribution
     ax1.hist(original_data, bins=30, density=True, alpha=0.7)
     ax1.set_title("Original Distribution")
@@ -29,10 +31,12 @@ def plot_distributions(original_data, sample_means):
 
     return fig
 
+
 st.title("Central Limit Theorem Interactive Demonstration")
 
 st.sidebar.header("Parameters")
-dist_type = st.sidebar.selectbox("Select Distribution", ['Uniform', 'Normal', 'Exponential', 'Binomial'])
+dist_type = st.sidebar.selectbox(
+    "Select Distribution", ['Uniform', 'Normal', 'Exponential', 'Multinomial'])
 
 if dist_type == 'Uniform':
     low = st.sidebar.slider("Lower Bound", 0.0, 10.0, 0.0)
@@ -45,12 +49,13 @@ elif dist_type == 'Normal':
 elif dist_type == 'Exponential':
     scale = st.sidebar.slider("Scale", 0.1, 10.0, 1.0)
     params = {'scale': scale}
-elif dist_type == 'Binomial':
+elif dist_type == 'Multinomial':
     n = st.sidebar.slider("Number of Trials", 1, 100, 10)
     p = st.sidebar.slider("Probability of Success", 0.0, 1.0, 0.5)
     params = {'n': n, 'p': p}
 
-population_size = st.sidebar.number_input("Population Size", 1000, 1000000, 10000)
+population_size = st.sidebar.number_input(
+    "Population Size", 1000, 1000000, 10000)
 sample_size = st.sidebar.slider("Sample Size", 1, 500, 30)
 num_samples = st.sidebar.slider("Number of Samples", 100, 10000, 1000)
 
@@ -59,15 +64,18 @@ if st.button("Generate Visualization"):
     original_data = generate_distribution(dist_type, population_size, **params)
 
     # Generate sample means
-    sample_means = [np.mean(generate_distribution(dist_type, sample_size, **params)) for _ in range(num_samples)]
+    sample_means = [np.mean(generate_distribution(
+        dist_type, sample_size, **params)) for _ in range(num_samples)]
 
     # Create and display the plot
     fig = plot_distributions(original_data, sample_means)
     st.pyplot(fig)
 
     # Display statistics
-    st.write(f"Original Distribution - Mean: {np.mean(original_data):.4f}, Std Dev: {np.std(original_data):.4f}")
-    st.write(f"Sample Means Distribution - Mean: {np.mean(sample_means):.4f}, Std Dev: {np.std(sample_means):.4f}")
+    st.write(
+        f"Original Distribution - Mean: {np.mean(original_data):.4f}, Std Dev: {np.std(original_data):.4f}")
+    st.write(
+        f"Sample Means Distribution - Mean: {np.mean(sample_means):.4f}, Std Dev: {np.std(sample_means):.4f}")
 
 st.write("""
 This application demonstrates the Central Limit Theorem:
