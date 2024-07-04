@@ -10,8 +10,10 @@ def generate_distribution(dist_type, size, **params):
         return np.random.normal(params['mean'], params['std'], size)
     elif dist_type == 'Exponential':
         return np.random.exponential(params['scale'], size)
-    elif dist_type == 'Multinomial':
-        return np.random.multinomial(params['n'], params['p'], size)
+    elif dist_type == 'Poisson':
+        return np.random.poisson(params['lam'], size)
+    elif dist_type == 'Gamma':
+        return np.random.gamma(params['shape'], params['scale'], size)
 
 
 def plot_distributions(original_data, sample_means):
@@ -35,8 +37,8 @@ def plot_distributions(original_data, sample_means):
 st.title("Central Limit Theorem Interactive Demonstration")
 
 st.sidebar.header("Parameters")
-dist_type = st.sidebar.selectbox(
-    "Select Distribution", ['Uniform', 'Normal', 'Exponential', 'Multinomial'])
+dist_type = st.sidebar.selectbox("Select Distribution", [
+                                 'Uniform', 'Normal', 'Exponential', 'Poisson', 'Gamma'])
 
 if dist_type == 'Uniform':
     low = st.sidebar.slider("Lower Bound", 0.0, 10.0, 0.0)
@@ -49,10 +51,13 @@ elif dist_type == 'Normal':
 elif dist_type == 'Exponential':
     scale = st.sidebar.slider("Scale", 0.1, 10.0, 1.0)
     params = {'scale': scale}
-elif dist_type == 'Multinomial':
-    n = st.sidebar.slider("Number of Trials", 1, 100, 10)
-    p = st.sidebar.slider("Probability of Success", 0.0, 1.0, 0.5)
-    params = {'n': n, 'p': p}
+elif dist_type == 'Poisson':
+    lam = st.sidebar.slider("Lambda (rate)", 0.1, 20.0, 5.0)
+    params = {'lam': lam}
+elif dist_type == 'Gamma':
+    shape = st.sidebar.slider("Shape (k)", 0.1, 10.0, 2.0)
+    scale = st.sidebar.slider("Scale (theta)", 0.1, 10.0, 2.0)
+    params = {'shape': shape, 'scale': scale}
 
 population_size = st.sidebar.number_input(
     "Population Size", 1000, 1000000, 10000)
@@ -83,4 +88,11 @@ This application demonstrates the Central Limit Theorem:
 2. Set the population size, sample size, and number of samples.
 3. Click 'Generate Visualization' to see the results.
 4. Observe how the distribution of sample means approaches a normal distribution, regardless of the original distribution's shape.
+
+Distribution Information:
+- Uniform: Models a constant probability over a range.
+- Normal: The classic bell-shaped curve.
+- Exponential: Models time between events in a Poisson process.
+- Poisson: Models the number of events in a fixed interval.
+- Gamma: Generalizes the exponential distribution.
 """)
